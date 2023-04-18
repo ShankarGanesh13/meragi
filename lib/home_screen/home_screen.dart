@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:meragi/home_screen/widget/card.dart';
 import 'package:meragi/models/produuct_model.dart';
 import 'package:meragi/services/services.dart';
+import 'package:flutter_rating_bar/flutter_rating_bar.dart';
 
 class HomeScreen extends StatefulWidget {
   HomeScreen({super.key});
@@ -15,40 +17,44 @@ class _HomeScreenState extends State<HomeScreen> {
 
   Widget build(BuildContext context) {
     return Scaffold(
+      appBar: AppBar(
+        shadowColor: Colors.white,
+        backgroundColor: Colors.white,
+        title: const Text(
+          "HOME",
+          style: TextStyle(
+              color: Colors.black, fontSize: 16, fontWeight: FontWeight.w500),
+        ),
+        centerTitle: true,
+      ),
       body: SingleChildScrollView(
         child: Padding(
           padding: const EdgeInsets.all(16.0),
-          child: Column(children: [
-            const SizedBox(
-              height: 200,
+          child:
+              Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+            const Text(
+              "Hot Deals For Today",
+              style: TextStyle(fontSize: 20, fontWeight: FontWeight.w500),
             ),
-            Center(
-              child: ElevatedButton(
-                  onPressed: () {
-                    setState(() {
-                      product = HttpService.getProduct();
-                    });
-                  },
-                  child: const Text("Get Product")),
+            const SizedBox(
+              height: 15,
             ),
             FutureBuilder(
-                future: product,
-                builder: (context, snapshot) {
-                  if (snapshot.data != null) {
-                    return ListView.builder(
-                      physics: NeverScrollableScrollPhysics(),
-                      shrinkWrap: true,
-                      itemCount: snapshot.data!.length,
-                      itemBuilder: (context, index) {
-                        return Padding(
-                          padding: const EdgeInsets.all(8.0),
-                          child: Text("TITLE: ${snapshot.data![index].title}"),
-                        );
-                      },
-                    );
-                  } else
-                    return Text("No product to show");
-                })
+              future: HttpService.getProduct(),
+              builder: (context, snapshot) {
+                if (snapshot.data != null) {
+                  return ListView.builder(
+                    shrinkWrap: true,
+                    physics: NeverScrollableScrollPhysics(),
+                    itemCount: snapshot.data!.length,
+                    itemBuilder: (context, index) {
+                      return MyProductCard(product: snapshot.data![index]);
+                    },
+                  );
+                } else
+                  return Center(child: CircularProgressIndicator());
+              },
+            )
           ]),
         ),
       ),
